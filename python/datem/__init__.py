@@ -1,6 +1,4 @@
-from .datem import *
+import importlib.metadata
 
 
-__doc__ = datem.__doc__
-if hasattr(datem, "__all__"):
-    __all__ = datem.__all__
+__version__ = importlib.metadata.version(__package__)
