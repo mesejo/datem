@@ -153,12 +153,7 @@ def convert_case(case, catalog):
     ]
     else_expr = convert(case.else_expr().to_variant(), catalog=catalog)
 
-    result = expr.case()
-
-    for condition, value in when_then_expr:
-        result = result.when(condition, value)
-
-    result = result.else_(else_expr).end()
+    result = expr.cases(*when_then_expr, else_=else_expr)
 
     return result
 
@@ -414,7 +409,7 @@ def convert_is_not_null(is_not_null, catalog):
 @convert.register(Not)
 def convert_not(is_not, catalog):
     expr = convert(is_not.expr().to_variant(), catalog=catalog)
-    return expr.negate()
+    return ~expr
 
 
 def plan_to_ibis(plan, catalog):
