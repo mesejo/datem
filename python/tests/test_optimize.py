@@ -177,7 +177,7 @@ def test_roundtrip_filter(con, t, condition):
     "condition",
     [
         lambda x: x.filter(x.g),
-        lambda x: x.filter(x.g.negate()),
+        lambda x: x.filter(~x.g),
         lambda x: x.filter(x.a.isin(["a1", "a2"])),
         lambda x: x.filter(x.a.isin(["a1", "a2"]) & x.g),
     ],
@@ -230,7 +230,7 @@ def test_roundtrip_nested_agg(con, g):
 
 @pytest.mark.xfail(reason="datafusion 42.0.0 update introduced a bug")
 def test_roundtrip_all(con, t):
-    original = t[t]
+    original = t.select(t)
     expr = optimize_ibis(original, {"t": t.schema()}, dialect="duckdb")
 
     expected = con.execute(original)
@@ -255,7 +255,7 @@ def test_roundtrip_sort(con, g, limit, offset):
 
 
 def test_roundtrip_case(con, t):
-    original = t.a.case().when("a1", 1).when("a2", 2).else_(3).end()
+    original = t.a.cases(("a1", 1), ("a2", 2), else_=3)
     expr = optimize_ibis(original, {"t": t.schema()}, dialect="duckdb")
 
     expected = con.execute(original)
